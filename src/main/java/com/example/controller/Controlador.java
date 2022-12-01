@@ -1,25 +1,57 @@
 package com.example.controller;
-
+import com.example.service.ServiceExample;
 import com.example.model.Libros;
 import com.example.repository.Biblioteca;
+import com.example.dto.UserDat;
+import io.swagger.annotations.*;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/home")
+@Api(tags = "home")
+@RequiredArgsConstructor
 public class Controlador {
-    @Autowired
-    Biblioteca biblioteca;
 
 
+    private final ServiceExample serviceExample;
 
+    private final ModelMapper modelMapper;
     List<Libros> libros = new ArrayList<>();
 
+    @PostMapping("/signin")
+    @ApiOperation(value = "${Controlador.signin}")
+    @ApiResponses(value = {//
+            @ApiResponse(code = 400, message = "Something  wrong"), //
+            @ApiResponse(code = 422, message = "No valid username/password")})
+    public String login(//
+                        @ApiParam("Username") @RequestParam String username, //
+                        @ApiParam("Password") @RequestParam String password) {
+        return serviceExample.signin(username, password);
+    }
+
+
+    @PostMapping("/signup")
+    @ApiOperation(value = "${Controlador.signup}")
+    @ApiResponses(value = {//
+            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 403, message = "Access denied"), //
+            @ApiResponse(code = 422, message = "Username is already in use")})
+    public String signup(@ApiParam("Signup User") @RequestBody UserDat user) {
+        return serviceExample.signup(modelMapper.map(user, Libros.class));
+    }
+
+
+
+
+
+    /*
     @GetMapping("/list/{id}")
     public List<Libros> listar(@PathVariable(value = "id") Long id){
 
@@ -39,7 +71,7 @@ public class Controlador {
                 .collect(Collectors.toList());
 
     }
-
+*/
 
 
 }
