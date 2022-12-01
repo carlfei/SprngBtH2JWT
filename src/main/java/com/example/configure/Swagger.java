@@ -65,4 +65,11 @@ public class Swagger {
     return Arrays.asList(new SecurityReference("Authorization", authorizationScopes));
   }
 
+
+
+
+
+
+
+
 }

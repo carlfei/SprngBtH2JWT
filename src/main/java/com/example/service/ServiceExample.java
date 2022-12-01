@@ -12,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 @RequiredArgsConstructor
 public class ServiceExample {
@@ -38,10 +40,32 @@ public class ServiceExample {
             biblioteca.save(libros);
             return jwtTokenProvider.createToken(libros.getUsername(), libros.getLibrosRole());
         } else {
-            throw new MyException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new MyException("Username in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
+
+
+
+    public void delete(String username) {
+        biblioteca.deleteByUsername(username);
+    }
+
+    public Libros search(String username) {
+        Libros libros = biblioteca.findByUsername(username);
+        if (libros == null) {
+            throw new MyException("The user doesn't exist", HttpStatus.NOT_FOUND);
+        }
+        return libros;
+    }
+
+    public Libros whoami(HttpServletRequest req) {
+        return biblioteca.findByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+    }
+
+    public String refresh(String username) {
+        return jwtTokenProvider.createToken(username, biblioteca.findByUsername(username).getLibrosRole());
+    }
 
 
 
